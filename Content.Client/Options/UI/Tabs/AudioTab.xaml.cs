@@ -62,6 +62,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Shared._Adventure.ACVar; // c4llv07e tts
 using Content.Client.Administration.Managers;
 using Content.Client.Audio;
 using Content.Shared._CorvaxGoob.CCCVars;
@@ -94,19 +95,12 @@ public sealed partial class AudioTab : Control
             scale: ContentAudioSystem.MasterVolumeMultiplier);
         masterVolume.ImmediateValueChanged += OnMasterVolumeSliderChanged;
 
-        // CorvaxGoob-TTS-Start
-        Control.AddOptionPercentSlider(
-            CCCVars.TTSVolume,
-            SliderVolumeTts,
-            scale: ContentAudioSystem.TtsMultiplier);
-        // CorvaxGoob-TTS-End
-
         // CorvaxGoob-Announcements-Volume-Start
         Control.AddOptionPercentSlider(
             CCCVars.AnnouncementsSound,
             SliderVolumeAnnouncements);
         // CorvaxGoob-Announcements-Volume-End
-        
+
         // CorvaxGoob-Revert : DB conflicts
         // Goob Station - Barks-start
         // Control.AddOptionPercentSlider(
@@ -114,6 +108,13 @@ public sealed partial class AudioTab : Control
         //     SliderVolumeBarks,
         //     scale: ContentAudioSystem.BarksMultiplier);
         // Goob Station - Barks-end
+
+        // c4llv07e tts begin
+        Control.AddOptionPercentSlider(
+            ACVars.TTSVolume,
+            SliderVolumeTts,
+            scale: ContentAudioSystem.TtsMultiplier);
+        // c4llv07e tts end
 
         Control.AddOptionPercentSlider(
             CVars.MidiVolume,
@@ -168,6 +169,7 @@ public sealed partial class AudioTab : Control
         Control.AddOptionCheckBox(CCVars.EventMusicEnabled, EventMusicCheckBox);
         Control.AddOptionCheckBox(CCVars.AdminSoundsEnabled, AdminSoundsCheckBox);
         Control.AddOptionCheckBox(CCVars.BwoinkSoundEnabled, BwoinkSoundCheckBox);
+        Control.AddOptionCheckBox(ACVars.TTSClientEnabled, TtsClientCheckBox); // c4llv07e tts
 
         Control.Initialize();
     }

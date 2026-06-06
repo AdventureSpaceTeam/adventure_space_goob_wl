@@ -60,7 +60,7 @@ public sealed partial class VoiceMaskSystem : EntitySystem
         SubscribeLocalEvent<VoiceMaskComponent, VoiceMaskChangeVerbMessage>(OnChangeVerb);
         SubscribeLocalEvent<VoiceMaskComponent, ClothingGotEquippedEvent>(OnEquip);
         SubscribeLocalEvent<VoiceMaskSetNameEvent>(OpenUI);
-        InitializeTTS(); // CorvaxGoob-TTS
+        InitializeTTS(); // c4llv07e tts
 
         Subs.CVar(_cfgManager, CCVars.MaxNameLength, value => _maxNameLength = value, true);
     }

@@ -107,7 +107,7 @@ using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 using Robust.Shared.Serialization.Manager;
 using Robust.Shared.Timing;
-using Content.Shared._CorvaxGoob.TTS;
+using Content.Shared._Adventure.TTS;
 using System.Linq;
 using System.Numerics;
 using Content.Goobstation.Common.Grab;
@@ -576,7 +576,6 @@ public sealed partial class ChangelingSystem : SharedChangelingSystem
             Name = metadata.EntityName,
             DNA = dna.DNA ?? Loc.GetString("forensics-dna-unknown"),
             Appearance = appearance,
-            Voice = tts.VoicePrototypeId // CorvaxGoob-TTS
         };
 
         if (fingerprint.Fingerprint != null)
@@ -648,7 +647,6 @@ public sealed partial class ChangelingSystem : SharedChangelingSystem
         {
             Comp<FingerprintComponent>(newEnt).Fingerprint = data.Fingerprint;
             Comp<DnaComponent>(newEnt).DNA = data.DNA;
-            Comp<TTSComponent>(newEnt).VoicePrototypeId = data.Voice; // CorvaxGoob-TTS
             _humanoid.CloneAppearance(data.Appearance.Owner, newEnt);
             _metaData.SetEntityName(newEnt, data.Name);
             var message = Loc.GetString("changeling-transform-finish", ("target", data.Name));

@@ -31,6 +31,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Shared._Adventure.TTS;
 using System.IO;
 using System.Linq;
 using System.Numerics;
@@ -55,7 +56,6 @@ using Robust.Shared.Serialization.Manager;
 using Robust.Shared.Serialization.Markdown;
 using Robust.Shared.Utility;
 using YamlDotNet.RepresentationModel;
-using Content.Shared._CorvaxGoob.TTS;
 using Content.Corvax.Interfaces.Shared;
 using Robust.Shared.Enums;
 
@@ -82,15 +82,6 @@ public abstract class SharedHumanoidAppearanceSystem : EntitySystem
     private ISharedSponsorsManager? _sponsors;
     [Dependency] private readonly SharedIdentitySystem _identity = default!;
 
-    // CorvaxGoob-TTS-Start
-    public const string DefaultVoice = "Garithos";
-    public static readonly Dictionary<Sex, string> DefaultSexVoice = new()
-    {
-        {Sex.Male, "Garithos"},
-        {Sex.Female, "Maiev"},
-        {Sex.Unsexed, "Myron"},
-    };
-    // CorvaxGoob-TTS-End
     public static readonly ProtoId<SpeciesPrototype> DefaultSpecies = "Human";
     public static readonly ProtoId<BarkPrototype> DefaultBarkVoice = "Alto"; // Goob Station - Barks
 
@@ -160,7 +151,7 @@ public abstract class SharedHumanoidAppearanceSystem : EntitySystem
 
     private void OnExamined(EntityUid uid, HumanoidAppearanceComponent component, ExaminedEvent args)
     {
-		// CorvaxGoob 
+		// CorvaxGoob
 		// Fix for incorrect pronouns PR #564
         var identity = ("user", Identity.Entity(uid, EntityManager));
         var species = ("species", GetSpeciesRepresentation(component.Species).ToLower());
@@ -581,7 +572,7 @@ public abstract class SharedHumanoidAppearanceSystem : EntitySystem
         }
 
         EnsureDefaultMarkings(uid, humanoid);
-        SetTTSVoice(uid, profile.Voice, humanoid); // CorvaxGoob-TTS
+        SetTTSVoice(uid, profile.Voice, humanoid); // c4llv07e tts
         // CorvaxGoob-Revert : DB conflicts
         // SetBarkVoice(uid, profile.BarkVoice, humanoid); // Goob Station - Barks
 
@@ -638,18 +629,6 @@ public abstract class SharedHumanoidAppearanceSystem : EntitySystem
         if (sync)
             Dirty(uid, humanoid);
     }
-
-    // CorvaxGoob-TTS-Start
-    // ReSharper disable once InconsistentNaming
-    public void SetTTSVoice(EntityUid uid, string voiceId, HumanoidAppearanceComponent humanoid)
-    {
-        if (!TryComp<TTSComponent>(uid, out var comp))
-            return;
-
-        humanoid.Voice = voiceId;
-        comp.VoicePrototypeId = voiceId;
-    }
-    // CorvaxGoob-TTS-End
 
     private void EnsureDefaultMarkings(EntityUid uid, HumanoidAppearanceComponent? humanoid)
     {
@@ -748,4 +727,16 @@ public abstract class SharedHumanoidAppearanceSystem : EntitySystem
 
         return Loc.GetString("identity-age-old");
     }
+
+    // c4llv07e tts begin
+    // ReSharper disable once InconsistentNaming
+    public void SetTTSVoice(EntityUid uid, string voiceId, HumanoidAppearanceComponent humanoid)
+    {
+        if (!TryComp<TTSComponent>(uid, out var comp))
+            return;
+
+        humanoid.Voice = voiceId;
+        comp.VoicePrototypeId = voiceId;
+    }
+    // c4llv07e tts end
 }

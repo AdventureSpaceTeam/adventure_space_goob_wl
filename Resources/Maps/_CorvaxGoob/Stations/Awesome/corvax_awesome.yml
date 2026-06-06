@@ -149793,7 +149793,6 @@ entities:
       parent: 6355
     - type: Physics
       canCollide: False
-    - type: TTS
     - type: InsideEntityStorage
 - proto: TargetSyndicate
   entities:

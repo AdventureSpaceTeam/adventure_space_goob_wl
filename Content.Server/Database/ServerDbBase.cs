@@ -127,6 +127,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Shared._Adventure.TTS;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -347,11 +348,11 @@ namespace Content.Server.Database
             if (Enum.TryParse<Gender>(profile.Gender, true, out var genderVal))
                 gender = genderVal;
 
-            // CorvaxGoob-TTS-Start
+            // c4llv07e tts
             var voice = profile.Voice;
             if (voice == String.Empty)
-                voice = SharedHumanoidAppearanceSystem.DefaultSexVoice[sex];
-            // CorvaxGoob-TTS-End
+                voice = TTSConfig.DefaultSexVoice[sex];
+            // c4llv07e tts
 
             // ReSharper disable once ConditionalAccessQualifierIsNonNullableAccordingToAPIContract
             var markingsRaw = profile.Markings?.Deserialize<List<string>>();
@@ -393,14 +394,11 @@ namespace Content.Server.Database
                 loadouts[role.RoleName] = loadout;
             }
 
-            // CorvaxGoob-Revert : DB conflicts
-            // var barkVoice = profile.BarkVoice ?? SharedHumanoidAppearanceSystem.DefaultBarkVoice; // Goob Station - Barks
-
             return new HumanoidCharacterProfile(
                 profile.CharacterName,
                 profile.FlavorText,
                 profile.Species,
-                voice, // CorvaxGoob-TTS
+                voice,
                 profile.Age,
                 sex,
                 gender,
@@ -420,7 +418,6 @@ namespace Content.Server.Database
                 antags.ToHashSet(),
                 traits.ToHashSet(),
                 loadouts
-                // barkVoice // Goob Station - Barks // CorvaxGoob-Revert : DB conflicts
             );
         }
 
@@ -435,10 +432,10 @@ namespace Content.Server.Database
             }
             var markings = JsonSerializer.SerializeToDocument(markingStrings);
 
+            profile.Voice = humanoid.Voice; // CorvaxGoob-TTS
             profile.CharacterName = humanoid.Name;
             profile.FlavorText = humanoid.FlavorText;
             profile.Species = humanoid.Species;
-            profile.Voice = humanoid.Voice; // CorvaxGoob-TTS
             profile.Age = humanoid.Age;
             profile.Sex = humanoid.Sex.ToString();
             profile.Gender = humanoid.Gender.ToString();
@@ -471,9 +468,6 @@ namespace Content.Server.Database
                 humanoid.TraitPreferences
                         .Select(t => new Trait { TraitName = t })
             );
-
-            // CorvaxGoob-Revert : DB conflicts
-            // profile.BarkVoice = humanoid.BarkVoice; // Goob Station - Barks
 
             profile.Loadouts.Clear();
 

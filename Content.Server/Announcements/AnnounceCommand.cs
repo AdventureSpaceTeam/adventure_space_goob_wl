@@ -19,7 +19,6 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Server._CorvaxGoob.TTS;
 using Content.Server.Administration;
 using Content.Server.Chat.Systems;
 using Content.Shared.Administration;
@@ -34,7 +33,6 @@ namespace Content.Server.Announcements;
 public sealed class AnnounceCommand : LocalizedEntityCommands
 {
     [Dependency] private readonly ChatSystem _chat = default!;
-    [Dependency] private readonly TTSSystem _tts = default!; // CorvaxGoob-TTS
     [Dependency] private readonly IPrototypeManager _proto = default!;
     [Dependency] private readonly IResourceManager _res = default!;
 
@@ -49,7 +47,7 @@ public sealed class AnnounceCommand : LocalizedEntityCommands
             case 0:
                 shell.WriteError(Loc.GetString("shell-need-minimum-one-argument"));
                 return;
-            case > 5: // CorvaxGoob-TTS Edit from 4 to 5
+            case > 4:
                 shell.WriteError(Loc.GetString("shell-wrong-arguments-number"));
                 return;
         }
@@ -83,14 +81,6 @@ public sealed class AnnounceCommand : LocalizedEntityCommands
 
         _chat.DispatchGlobalAnnouncement(message, sender, true, sound, color);
 
-        // CorvaxGoob-TTS-Start
-        if (args.Length >= 5)
-        {
-            _tts.SendTTSAdminAnnouncement(message, args[4], args[3]);
-
-        }
-         // CorvaxGoob-TTS-Start
-
         shell.WriteLine(Loc.GetString("shell-command-success"));
     }
 
@@ -105,7 +95,6 @@ public sealed class AnnounceCommand : LocalizedEntityCommands
                 CompletionHelper.AudioFilePath(args[3], _proto, _res),
                 Loc.GetString("cmd-announce-arg-sound")
             ),
-            5 => CompletionResult.FromHint(Loc.GetString("cmd-announce-arg-voice")), // CorvaxGoob-TTS
             _ => CompletionResult.Empty
         };
     }

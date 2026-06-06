@@ -14,6 +14,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+using Content.Shared._Adventure.TTS; // adventure tts
 using Content.Server.Chat.Systems;
 using Content.Server.Emp;
 using Content.Server.Radio.Components;
@@ -140,6 +141,16 @@ public sealed class HeadsetSystem : SharedHeadsetSystem
                 Message = canUnderstand ? args.OriginalChatMsg : args.LanguageObfuscatedChatMsg
             };
             _netMan.ServerSendMessage(msg, actor.PlayerSession.Channel);
+            if (args.Voice is string voice)
+            {
+                var listener = component.Owner;
+                var ev = new TTSRadioPlayEvent(args.OriginalChatMsg.Message, voice, GetNetEntity(uid), GetNetEntity(args.MessageSource));
+                var ov = new TTSRadioPlayEvent(args.LanguageObfuscatedChatMsg.Message, voice, GetNetEntity(uid), GetNetEntity(args.MessageSource));
+                if (listener != null && !_language.CanUnderstand(listener, args.Language.ID))
+                    RaiseLocalEvent(Transform(uid).ParentUid, ov);
+                else
+                    RaiseLocalEvent(Transform(uid).ParentUid, ev);
+            }
         }
         // Einstein Engines - Language end
     }

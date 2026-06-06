@@ -56,6 +56,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Shared._Adventure.TTS; // adventure tts
 using Content.Shared.Armor;
 using Content.Shared.Atmos;
 using Content.Shared.Chat;
@@ -63,7 +64,6 @@ using Content.Shared.Chat.RadioIconsEvents; // Goobstation
 using Content.Shared.Chemistry;
 using Content.Shared.Chemistry.Hypospray.Events;
 using Content.Shared.Climbing.Events;
-using Content.Shared._CorvaxGoob.TTS;
 using Content.Shared.Contraband;
 using Content.Shared.Damage;
 using Content.Shared.Damage.Events;
@@ -106,7 +106,7 @@ public partial class InventorySystem
         SubscribeLocalEvent<InventoryComponent, ModifyChangedTemperatureEvent>(RelayInventoryEvent);
         SubscribeLocalEvent<InventoryComponent, GetDefaultRadioChannelEvent>(RelayInventoryEvent);
         SubscribeLocalEvent<InventoryComponent, RefreshNameModifiersEvent>(RelayInventoryEvent);
-
+        SubscribeLocalEvent<InventoryComponent, TransformSpeakerVoiceEvent>(RelayInventoryEvent); // adventure tts
         SubscribeLocalEvent<InventoryComponent, TransformSpeakerNameEvent>(RelayInventoryEvent);
         SubscribeLocalEvent<InventoryComponent, TransformSpeakerJobIconEvent>(RelayInventoryEvent); // GabyStation -> Radio icons
         SubscribeLocalEvent<InventoryComponent, SelfBeforeHyposprayInjectsEvent>(RelayInventoryEvent);
@@ -121,7 +121,6 @@ public partial class InventorySystem
         SubscribeLocalEvent<InventoryComponent, BeforeEmoteEvent>(RelayInventoryEvent);
 
         // CorvaxGoob
-        SubscribeLocalEvent<InventoryComponent, TransformSpeakerVoiceEvent>(RelayInventoryEvent);
         SubscribeLocalEvent<InventoryComponent, CoefficientStaminaQueryEvent>(RelayInventoryEvent);
 
         // by-ref events

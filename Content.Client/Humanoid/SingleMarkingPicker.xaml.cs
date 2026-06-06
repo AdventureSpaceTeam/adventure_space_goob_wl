@@ -209,10 +209,10 @@ public sealed partial class SingleMarkingPicker : BoxContainer
             var item = MarkingList.AddItem(Loc.GetString($"marking-{id}"), _sprite.Frame0(marking.Sprites[0]));
             item.Metadata = marking.ID;
             // CorvaxGoob-Sponsors-Start
-            if (marking.SponsorOnly)
-                item.Text += SponsorUtils.GetSponsorOnlySuffix();
-            if (marking.SponsorOnly && _sponsorsManager != null)
-                item.Disabled = !_sponsorsManager.GetClientPrototypes().Contains(marking.ID);
+            // if (marking.SponsorOnly)
+            //     item.Text += SponsorUtils.GetSponsorOnlySuffix();
+            // if (marking.SponsorOnly && _sponsorsManager != null)
+            //     item.Disabled = !_sponsorsManager.GetClientPrototypes().Contains(marking.ID);
             // CorvaxGoob-Sponsors-End
 
             if (_markings[Slot].MarkingId == id)

@@ -194,7 +194,7 @@
   - type: TypingIndicator
     proto: robot
   - type: TTS # CorvaxGoob-TTS
-    voice: TrainingRobot
+    voice: glados
   - type: Speech
     speechVerb: Robotic
     speechSounds: Pai

@@ -245,13 +245,13 @@ public sealed partial class MarkingPicker : Control
             }
 
             var item = CMarkingsUnused.AddItem($"{GetMarkingName(marking)}", _sprite.Frame0(marking.Sprites[0]));
-            if (marking.SponsorOnly) // CorvaxGoob-Start
-                item.Text += SponsorUtils.GetSponsorOnlySuffix();
-            // Corvax-Sponsors-End
+            // if (marking.SponsorOnly) // CorvaxGoob-Start
+            //     item.Text += SponsorUtils.GetSponsorOnlySuffix();
+            // // Corvax-Sponsors-End
             item.Metadata = marking;
             // CorvaxGoob-Sponsors-Start
-            if (marking.SponsorOnly && _sponsorsManager != null)
-                item.Disabled = !_sponsorsManager.GetClientPrototypes().Contains(marking.ID);
+            // if (marking.SponsorOnly && _sponsorsManager != null)
+            //     item.Disabled = !_sponsorsManager.GetClientPrototypes().Contains(marking.ID);
             // CorvaxGoob-Sponsors-End
         }
 

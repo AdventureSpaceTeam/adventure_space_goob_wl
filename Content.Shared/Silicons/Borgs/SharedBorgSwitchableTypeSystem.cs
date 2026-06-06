@@ -13,8 +13,6 @@ using Content.Shared.Movement.Components;
 using Content.Shared.Silicons.Borgs.Components;
 using Robust.Shared.Player;
 using Robust.Shared.Prototypes;
-using Content.Shared._CorvaxGoob.TTS; // CorvaxGoob-TTS
-
 namespace Content.Shared.Silicons.Borgs;
 
 /// <summary>
@@ -138,12 +136,5 @@ public abstract class SharedBorgSwitchableTypeSystem : EntitySystem
         {
             footstepModifier.FootstepSoundCollection = prototype.FootstepCollection;
         }
-
-        // CorvaxGoob-TTS-start
-        if (TryComp(entity, out TTSComponent? tts))
-        {
-            tts.VoicePrototypeId = prototype.VoicePrototypeId;
-        }
-        // CorvaxGoob-TTS-end
     }
 }

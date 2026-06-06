@@ -39,6 +39,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Shared._Adventure.TTS; // Adventure tts
 using System.Linq;  // goob - intermap transmitters
 using Content.Goobstation.Shared.Communications; // goob - intermap transmitters
 using Content.Goobstation.Shared.Loudspeaker.Events; // goob - loudspeakers
@@ -119,7 +120,17 @@ public sealed partial class RadioSystem : EntitySystem
 
             if (listener != null && !_language.CanUnderstand(listener, args.Language.ID))
                 msg = args.LanguageObfuscatedChatMsg;
-
+            // adventure tts begin
+            if (args.Voice is not null)
+            {
+                var ev = new TTSRadioPlayEvent(args.OriginalChatMsg.Message, args.Voice, GetNetEntity(uid), GetNetEntity(args.MessageSource));
+                var ov = new TTSRadioPlayEvent(args.LanguageObfuscatedChatMsg.Message, args.Voice, GetNetEntity(uid), GetNetEntity(args.MessageSource));
+                if (listener != null && !_language.CanUnderstand(listener, args.Language.ID))
+                    RaiseLocalEvent(Transform(uid).ParentUid, ov);
+                else
+                    RaiseLocalEvent(Transform(uid).ParentUid, ev);
+            }
+            // adventure tts end
             _netMan.ServerSendMessage(new MsgChatMessage { Message = msg }, actor.PlayerSession.Channel);
             // Einstein Engines - Languages end
         }
@@ -206,6 +217,12 @@ public sealed partial class RadioSystem : EntitySystem
             ? FormattedMessage.EscapeText(message)
             : message;
 
+        // adventure tts begin
+        string? voice = null;
+        if (TryComp<TTSComponent>(messageSource, out var tts))
+            voice = tts.VoicePrototypeId;
+        // adventure tts end
+
         // var wrappedMessage = Loc.GetString(speech.Bold ? "chat-radio-message-wrap-bold" : "chat-radio-message-wrap",
         //     ("color", channel.Color),
         //     ("fontType", speech.FontId),
@@ -235,7 +252,7 @@ public sealed partial class RadioSystem : EntitySystem
         // Added GetNetEntity(messageSource), to source
         var obfuscatedWrapped = WrapRadioMessage(messageSource, channel, name, obfuscated, language, jobIcon, jobName);
         var notUdsMsg = new ChatMessage(ChatChannel.Radio, obfuscated, obfuscatedWrapped, GetNetEntity(messageSource), null);
-        var ev = new RadioReceiveEvent(messageSource, channel, msg, notUdsMsg, language, radioSource);
+        var ev = new RadioReceiveEvent(messageSource, channel, msg, notUdsMsg, language, radioSource, voice);
         // Einstein Engines - Language end
 
         var sendAttemptEv = new RadioSendAttemptEvent(channel, radioSource);

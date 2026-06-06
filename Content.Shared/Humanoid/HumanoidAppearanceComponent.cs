@@ -14,7 +14,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-using Content.Shared._CorvaxGoob.TTS;
+using Content.Shared._Adventure.TTS; // Adventure tts
 using Content.Shared.DisplacementMap;
 using Content.Shared.Humanoid.Markings;
 using Content.Shared.Humanoid.Prototypes;
@@ -31,6 +31,14 @@ namespace Content.Shared.Humanoid;
 public sealed partial class HumanoidAppearanceComponent : Component
 {
     public MarkingSet ClientOldMarkings = new();
+
+    // Adventure tts begin
+    /// <summary>
+    ///     Current voice. Used for correct cloning.
+    /// </summary>
+    [DataField]
+    public ProtoId<TTSVoicePrototype> Voice { get; set; } = TTSConfig.DefaultVoice;
+    // Adventure tts end
 
     [DataField, AutoNetworkedField]
     public MarkingSet MarkingSet = new();
@@ -68,14 +76,6 @@ public sealed partial class HumanoidAppearanceComponent : Component
     /// </summary>
     [DataField(required: true), AutoNetworkedField]
     public ProtoId<SpeciesPrototype> Species { get; set; }
-
-    // CorvaxGoob-TTS-Start
-    /// <summary>
-    ///     Current voice. Used for correct cloning.
-    /// </summary>
-    [DataField("voice")]
-    public ProtoId<TTSVoicePrototype> Voice { get; set; } = SharedHumanoidAppearanceSystem.DefaultVoice;
-    // CorvaxGoob-TTS-End
 
     /// <summary>
     ///     The initial profile and base layers to apply to this humanoid.

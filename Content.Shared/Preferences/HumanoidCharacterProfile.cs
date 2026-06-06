@@ -49,10 +49,10 @@
 // SPDX-FileCopyrightText: 2025 pheenty <fedorlukin2006@gmail.com>
 //
 
+using Content.Shared._Adventure.TTS;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Content.Shared.CCVar;
-using Content.Shared._CorvaxGoob.TTS;
 using Content.Shared.Dataset;
 using Content.Shared.GameTicking;
 using Content.Shared.Humanoid;
@@ -82,6 +82,11 @@ namespace Content.Shared.Preferences
     {
         private static readonly Regex RestrictedNameRegex = new("[^А-Яа-яёЁ0-9' -]"); // CorvaxGoob-Localization
         private static readonly Regex ICNameCaseRegex = new(@"^(?<word>\w)|\b(?<word>\w)(?=\w*$)");
+
+        // Adventure tts begin
+        [DataField]
+        public string Voice { get; set; } = TTSConfig.DefaultVoice;
+        // Adventure tts end
 
         /// <summary>
         /// Job preferences for initial spawn.
@@ -128,11 +133,6 @@ namespace Content.Shared.Preferences
         /// </summary>
         [DataField]
         public ProtoId<SpeciesPrototype> Species { get; set; } = SharedHumanoidAppearanceSystem.DefaultSpecies;
-
-        // CorvaxGoob-TTS-Start
-        [DataField]
-        public string Voice { get; set; } = SharedHumanoidAppearanceSystem.DefaultVoice;
-        // CorvaxGoob-TTS-End
 
         // CorvaxGoob-Revert : DB conflicts
         // [DataField] // Goob Station - Barks
@@ -258,7 +258,7 @@ namespace Content.Shared.Preferences
         ///     Defaults to <see cref="SharedHumanoidAppearanceSystem.DefaultSpecies"/> for the species.
         /// </summary>
         /// <returns></returns>
-        public HumanoidCharacterProfile()
+        public HumanoidCharacterProfile(string characterName)
         {
         }
 
@@ -310,13 +310,6 @@ namespace Content.Shared.Preferences
                 height = random.NextFloat(speciesPrototype.MinHeight, speciesPrototype.MaxHeight); // Goobstation: port EE height/width sliders
                 width = random.NextFloat(speciesPrototype.MinWidth, speciesPrototype.MaxWidth); // Goobstation: port EE height/width sliders
             }
-
-            // CorvaxGoob-TTS-Start
-            var voiceId = random.Pick(prototypeManager
-                .EnumeratePrototypes<TTSVoicePrototype>()
-                .Where(o => CanHaveVoice(o, sex)).ToArray()
-            ).ID;
-            // CorvaxGoob-TTS-End
             // CorvaxGoob-Revert : DB conflicts
             // Goob Station - Barks Start
             // var barkvoiceId = random.Pick(prototypeManager
@@ -325,6 +318,15 @@ namespace Content.Shared.Preferences
             //     .ToArray()
             // );
             //  Goob Station - Barks End
+
+            // c4llv07e tts begin
+            var voices = prototypeManager.EnumeratePrototypes<TTSVoicePrototype>().ToArray();
+            string voiceId = string.Empty;
+            if (voices.Count() != 0)
+            {
+                voiceId = random.Pick(voices).ID;
+            }
+            // c4llv07e tts end
 
             var gender = Gender.Epicene;
 
@@ -348,8 +350,8 @@ namespace Content.Shared.Preferences
                 Age = age,
                 Gender = gender,
                 Species = species,
-                Voice = voiceId, // CorvaxGoob-TTS
                 Appearance = HumanoidCharacterAppearance.Random(species, sex),
+                Voice = voiceId, // c4llv07e tts
                 // BarkVoice = barkvoiceId, // Goob Station - Barks // CorvaxGoob-Revert : DB conflicts
             };
         }
@@ -384,12 +386,12 @@ namespace Content.Shared.Preferences
             return new(this) { Species = species };
         }
 
-        // CorvaxGoob-TTS-Start
+        // c4llv07e tts begin
         public HumanoidCharacterProfile WithVoice(string voice)
         {
             return new(this) { Voice = voice };
         }
-        // CorvaxGoob-TTS-End
+        // c4llv07e tts end
 
         public HumanoidCharacterProfile WithCharacterAppearance(HumanoidCharacterAppearance appearance)
         {
@@ -592,14 +594,6 @@ namespace Content.Shared.Preferences
                 speciesPrototype = prototypeManager.Index(Species);
             }
 
-            // CorvaxGoob-Sponsors-Start: Reset to human if player not sponsor
-            if (speciesPrototype.SponsorOnly && !sponsorPrototypes.Contains(Species.Id))
-            {
-                Species = SharedHumanoidAppearanceSystem.DefaultSpecies;
-                speciesPrototype = prototypeManager.Index(Species);
-            }
-            // CorvaxGoob-Sponsors-End
-
             var sex = Sex switch
             {
                 Sex.Male => Sex.Male,
@@ -740,11 +734,11 @@ namespace Content.Shared.Preferences
             _traitPreferences.Clear();
             _traitPreferences.UnionWith(GetValidTraits(traits, prototypeManager));
 
-            // CorvaxGoob-TTS-Start
+            // c4llv07e tts begin
             prototypeManager.TryIndex<TTSVoicePrototype>(Voice, out var voice);
-            if (voice is null || !CanHaveVoice(voice, Sex))
-                Voice = SharedHumanoidAppearanceSystem.DefaultSexVoice[sex];
-            // CorvaxGoob-TTS-End
+            if (voice is null)
+                Voice = TTSConfig.DefaultSexVoice[sex];
+            // c4llv07e tts end
 
             // Checks prototypes exist for all loadouts and dump / set to default if not.
             var toRemove = new ValueList<string>();
@@ -806,13 +800,6 @@ namespace Content.Shared.Preferences
             return result;
         }
 
-        // CorvaxGoob-TTS-Start
-        // SHOULD BE NOT PUBLIC, BUT....
-        public static bool CanHaveVoice(TTSVoicePrototype voice, Sex sex)
-        {
-            return voice.RoundStart && sex == Sex.Unsexed || (voice.Sex == sex || voice.Sex == Sex.Unsexed);
-        }
-        // CorvaxGoob-TTS-End
         public ICharacterProfile Validated(ICommonSession session, IDependencyCollection collection, string[] sponsorPrototypes)
         {
             var profile = new HumanoidCharacterProfile(this);

@@ -396,7 +396,6 @@ public sealed partial class CreditsWindow : DefaultWindow
             ss14ContributorsContainer.AddChild(label);
         }
 
-        AddSection(Loc.GetString("credits-window-tts-title"), "TTS.txt"); // CorvaxGoob-TTS
         AddSection(Loc.GetString("credits-window-contributors-section-title"), "GitHub.txt");
         AddSection(Loc.GetString("credits-window-corvax-contributors-section-title"), "CorvaxGitHub.txt"); // CorvaxGoob-Credits
         AddSection(Loc.GetString("credits-window-codebases-section-title"), "SpaceStation13.txt");

@@ -2,7 +2,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Content.Server.Chat.Systems;
 
-namespace Content.Server._CorvaxGoob.TTS;
+namespace Content.Server._Adventure.TTS;
 
 // ReSharper disable once InconsistentNaming
 public sealed partial class TTSSystem
@@ -13,14 +13,22 @@ public sealed partial class TTSSystem
         args.Message = args.Message.Replace("+", "");
     }
 
+    private static readonly Regex NonAllowedChars = new Regex(@"[^a-zA-Zа-яА-ЯёЁ0-9,\-+?!. ]", RegexOptions.Compiled);
+    private static readonly Regex Dygraphs = new Regex(@"(jsh|ch|sh|ja|ju|je|zh|hh|ih|jh|eh)", RegexOptions.Compiled | RegexOptions.Multiline | RegexOptions.IgnoreCase);
+    private static readonly Regex Latin = new Regex(@"[a-zA-Z]", RegexOptions.Compiled | RegexOptions.Multiline | RegexOptions.IgnoreCase);
+    private static readonly Regex MatchedWord = new Regex(@"(?<![a-zA-Zа-яёА-ЯЁ])[a-zA-Zа-яёА-ЯЁ]+?(?![a-zA-Zа-яёА-ЯЁ])", RegexOptions.Compiled | RegexOptions.Multiline | RegexOptions.IgnoreCase);
+    private static readonly Regex DecimalSep = new Regex(@"(?<=[1-90])(\.|,)(?=[1-90])", RegexOptions.Compiled);
+    private static readonly Regex Numbers = new Regex(@"\d+", RegexOptions.Compiled);
+
     private string Sanitize(string text)
     {
         text = text.Trim();
-        text = Regex.Replace(text, @"[^a-zA-Zа-яА-ЯёЁ0-9,\-+?!. ]", "");
-        text = Regex.Replace(text, @"[a-zA-Z]", ReplaceLat2Cyr, RegexOptions.Multiline | RegexOptions.IgnoreCase);
-        text = Regex.Replace(text, @"(?<![a-zA-Zа-яёА-ЯЁ])[a-zA-Zа-яёА-ЯЁ]+?(?![a-zA-Zа-яёА-ЯЁ])", ReplaceMatchedWord, RegexOptions.Multiline | RegexOptions.IgnoreCase);
-        text = Regex.Replace(text, @"(?<=[1-90])(\.|,)(?=[1-90])", " целых ");
-        text = Regex.Replace(text, @"\d+", ReplaceWord2Num);
+        text = NonAllowedChars.Replace(text, "");
+        text = Dygraphs.Replace(text, ReplaceLat2Cyr);
+        text = Latin.Replace(text, ReplaceLat2Cyr);
+        text = MatchedWord.Replace(text, ReplaceMatchedWord);
+        text = DecimalSep.Replace(text, " целых ");
+        text = Numbers.Replace(text, ReplaceWord2Num);
         text = text.Trim();
         return text;
     }
@@ -137,14 +145,33 @@ public sealed partial class TTSSystem
             {"с4", "Си 4"}, // cyrillic
             {"c4", "Си 4"}, // latinic
             {"бсс", "Бэ Эс Эс"},
-            {"сии", "Эс И И"},
+            {"бм", "Бэ Эм"},
+            {"бма", "Бэ Эма"},
+            {"бму", "Бэ Эму"},
+            {"бмом", "Бэ Эмом"},
+            {"рпс", "Эр Пэ Эс"},
+            {"опрс", "О Пэ Эр Эс"},
+            {"осб", "О Эс Бэ"},
+            {"ттс", "Тэ Тэ Эс"},
+            {"рсу", "Эр Сэ У"},
+            {"упт", "У Пэ Тэ"},
+            {"гбс", "Гэ Бэ Эс"},
+            {"снс", "Эс Эн Эс"},
+            {"снсу", "Эс Эн Эсу"},
+            {"снса", "Эс Эн Эса"},
+            {"снсом", "Эс Эн Эсом"},
+            {"вв", "Вэ Вэ"},
+            {"ви", "Вэ И"},
             {"ии", "И И"},
-            {"опз", "О Пэ Зэ"},
+            {"осщ", "О Сэ Ща"},
         };
 
     private static readonly IReadOnlyDictionary<string, string> ReverseTranslit =
         new Dictionary<string, string>()
         {
+            {"й", "й"},
+            {"ъ", "ъ"},
+            {"ь", "ь"},
             {"a", "а"},
             {"b", "б"},
             {"v", "в"},
@@ -170,8 +197,10 @@ public sealed partial class TTSSystem
             {"h", "х"},
             {"c", "ц"},
             {"x", "кс"},
+            {"w", "в"},
             {"ch", "ч"},
             {"sh", "ш"},
+            {"ph", "ф"},
             {"jsh", "щ"},
             {"hh", "ъ"},
             {"ih", "ы"},

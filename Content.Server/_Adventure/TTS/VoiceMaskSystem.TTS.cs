@@ -1,6 +1,7 @@
-using Content.Shared._CorvaxGoob.TTS;
-using Content.Shared.Inventory;
+using Content.Server._Adventure.TTS;
 using Content.Shared.VoiceMask;
+using Content.Shared._Adventure.TTS;
+using Content.Shared.Inventory;
 
 namespace Content.Server.VoiceMask;
 
@@ -12,9 +13,9 @@ public partial class VoiceMaskSystem
         SubscribeLocalEvent<VoiceMaskComponent, VoiceMaskChangeVoiceMessage>(OnChangeVoice);
     }
 
-    private void OnSpeakerVoiceTransform(EntityUid uid, VoiceMaskComponent component, InventoryRelayedEvent<TransformSpeakerVoiceEvent> args)
+    private void OnSpeakerVoiceTransform(Entity<VoiceMaskComponent> ent, ref InventoryRelayedEvent<TransformSpeakerVoiceEvent> args)
     {
-        args.Args.VoiceId = component.VoiceId;
+        args.Args.VoiceId = ent.Comp.VoiceId;
     }
 
     private void OnChangeVoice(Entity<VoiceMaskComponent> entity, ref VoiceMaskChangeVoiceMessage msg)

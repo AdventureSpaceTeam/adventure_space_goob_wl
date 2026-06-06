@@ -134,6 +134,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Server._Adventure.TTS; // c4llv07e tts
 using Content.Server.Acz;
 using Content.Server.Administration;
 using Content.Server.Administration.Logs;
@@ -167,7 +168,6 @@ using Robust.Shared.ContentPack;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Timing;
 using Robust.Shared.Utility;
-using Content.Server._CorvaxGoob.TTS;
 using Content.Server.Corvax.GuideGenerator;
 using System.IO;
 
@@ -245,9 +245,9 @@ namespace Content.Server.Entry
                 IoCManager.Resolve<INodeGroupFactory>().Initialize();
                 IoCManager.Resolve<ContentNetworkResourceManager>().Initialize();
                 IoCManager.Resolve<GhostKickManager>().Initialize();
-                IoCManager.Resolve<TTSManager>().Initialize(); // CorvaxGoob-TTS
                 IoCManager.Resolve<ServerInfoManager>().Initialize();
                 IoCManager.Resolve<ServerApi>().Initialize();
+                IoCManager.Resolve<TTSManager>().Initialize(); // c4llv07e tts
 
                 _voteManager.Initialize();
                 _updateManager.Initialize();

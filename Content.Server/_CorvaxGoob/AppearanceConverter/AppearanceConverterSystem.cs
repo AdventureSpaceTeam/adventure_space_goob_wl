@@ -3,7 +3,6 @@ using Content.Server.Chat.TypingIndicator;
 using Content.Server.Humanoid;
 using Content.Server.Popups;
 using Content.Shared._CorvaxGoob.AppearanceConverter;
-using Content.Shared._CorvaxGoob.TTS;
 using Content.Shared._EinsteinEngines.HeightAdjust;
 using Content.Shared.Chat.TypingIndicator;
 using Content.Shared.DoAfter;
@@ -398,9 +397,6 @@ public sealed class AppearanceConverterSystem : EntitySystem
         if (profile.Name is not null)
             _meta.SetEntityName(target, profile.Name);
 
-        if (profile.Voice is not null && TryComp<TTSComponent>(target, out var tts))
-            tts.VoicePrototypeId = profile.Voice;
-
         _heightAdjust.SetScale(target, profile.Scale);
 
         if (profile.SkinColor is not null)
@@ -520,9 +516,6 @@ public sealed class AppearanceConverterSystem : EntitySystem
             profile.SpeechVerbPrototype = speech.SpeechVerb;
             profile.SpeechSounds = speech.SpeechSounds;
         }
-
-        if (TryComp<TTSComponent>(entityUid, out var tts))
-            profile.Voice = tts.VoicePrototypeId;
 
         profile.Markings = humanoidAppearance.MarkingSet;
 

@@ -153,6 +153,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Shared._Adventure.ACVar; // c4llv07e tts
 using System.IO;
 using System.Linq;
 using System.Numerics;
@@ -192,8 +193,6 @@ using Robust.Shared.Prototypes;
 using Robust.Shared.Physics.Systems;
 using Robust.Shared.Utility;
 using Direction = Robust.Shared.Maths.Direction;
-using Content.Client._CorvaxGoob.TTS;
-using Content.Shared._CorvaxGoob; // CorvaxGoob-TTS
 
 namespace Content.Client.Lobby.UI
 {
@@ -223,7 +222,6 @@ namespace Content.Client.Lobby.UI
         // One at a time.
         private LoadoutWindow? _loadoutWindow;
 
-        private TTSTab? _ttsTab;// CorvaxGoob-TTS
 
         private bool _exporting;
         private bool _imaging;
@@ -383,17 +381,14 @@ namespace Content.Client.Lobby.UI
 
             #endregion Gender
 
-            // Goob Station
-            #region Barks
-
-            // CorvaxGoob-Revert : DB conflicts
-/*            if (configurationManager.GetCVar(GoobCVars.BarksEnabled))
+            // c4llv07e tts begin
+            if (configurationManager.GetCVar(ACVars.TTSEnabled))
             {
-                BarksContainer.Visible = true;
-                InitializeBarkVoice();
-            }*/
+                TTSContainer.Visible = true;
+                InitializeVoice();
+            }
+            // c4llv07e tts end
 
-            #endregion
 
             RefreshSpecies();
 
@@ -617,8 +612,6 @@ namespace Content.Client.Lobby.UI
 
             RefreshTraits();
 
-            TabContainer.SetTabTitle(3, Loc.GetString("humanoid-profile-editor-traits-tab")); // CorvaxGoob-TTS-Edit
-
             #region Markings
 
             TabContainer.SetTabTitle(4, Loc.GetString("humanoid-profile-editor-markings-tab"));
@@ -631,8 +624,6 @@ namespace Content.Client.Lobby.UI
             #endregion Markings
 
             RefreshFlavorText();
-
-            RefreshVoiceTab(); // CorvaxGoob-TTS
 
             #region Dummy
 
@@ -693,56 +684,6 @@ namespace Content.Client.Lobby.UI
             }
         }
 
-        //CorvaxGoob-TTS-Start
-        #region Voice
-
-        private void RefreshVoiceTab()
-        {
-            if (!_cfgManager.GetCVar(CCCVars.TTSEnabled))
-                return;
-
-            _ttsTab = new TTSTab();
-            var children = new List<Control>();
-            foreach (var child in TabContainer.Children)
-                children.Add(child);
-
-            TabContainer.RemoveAllChildren();
-
-            for (int i = 0; i < children.Count; i++)
-            {
-                if (i == 1) // Set the tab to the 2nd place.
-                {
-                    TabContainer.AddChild(_ttsTab);
-                }
-                TabContainer.AddChild(children[i]);
-            }
-
-            TabContainer.SetTabTitle(1, Loc.GetString("humanoid-profile-editor-voice-tab"));
-
-            _ttsTab.OnVoiceSelected += voiceId =>
-            {
-                SetVoice(voiceId);
-                _ttsTab.SetSelectedVoice(voiceId);
-            };
-
-            _ttsTab.OnPreviewRequested += voiceId =>
-            {
-                _entManager.System<TTSSystem>().RequestPreviewTTS(voiceId);
-            };
-        }
-
-        private void UpdateTTSVoicesControls()
-        {
-            if (Profile is null || _ttsTab is null)
-                return;
-
-            _ttsTab.UpdateControls(Profile, Profile.Sex);
-            _ttsTab.SetSelectedVoice(Profile.Voice);
-        }
-
-        #endregion
-        // CorvaxGoob-TTS-End
-
         /// <summary>
         /// Refreshes traits selector
         /// </summary>
@@ -751,7 +692,7 @@ namespace Content.Client.Lobby.UI
             TraitsList.DisposeAllChildren();
 
             var traits = _prototypeManager.EnumeratePrototypes<TraitPrototype>().OrderBy(t => Loc.GetString(t.Name)).ToList();
-            //TabContainer.SetTabTitle(3, Loc.GetString("humanoid-profile-editor-traits-tab")); // CorvaxGoob-TTS-Edit
+            TabContainer.SetTabTitle(3, Loc.GetString("humanoid-profile-editor-traits-tab"));
 
             if (traits.Count < 1)
             {
@@ -879,8 +820,8 @@ namespace Content.Client.Lobby.UI
             {
                 var name = Loc.GetString(_species[i].Name);
 
-                if (_species[i].SponsorOnly) // CorvaxGoob-Sponsors
-                    name += SponsorUtils.GetSponsorOnlySuffix();
+                //if (_species[i].SponsorOnly) // CorvaxGoob-Sponsors
+                //    name += SponsorUtils.GetSponsorOnlySuffix();
 
                 SpeciesButton.AddItem(name, i);
 
@@ -1055,6 +996,8 @@ namespace Content.Client.Lobby.UI
             IsDirty = false;
             JobOverride = null;
 
+            UpdateTTSVoicesControls(); // c4llv07e tts
+
             UpdateNameEdit();
             UpdateFlavorTextEdit();
             UpdateSexControls();
@@ -1065,7 +1008,6 @@ namespace Content.Client.Lobby.UI
             UpdateEyePickers();
             UpdateSaveButton();
             UpdateMarkings();
-            UpdateTTSVoicesControls(); // CorvaxGoob-TTS
             // CorvaxGoob-Revert : DB conflicts
             // UpdateBarkVoice(); // Goob Station - Barks
             UpdateHairPickers();
@@ -1531,8 +1473,9 @@ namespace Content.Client.Lobby.UI
                     break;
             }
 
+            UpdateTTSVoicesControls(); // c4llv07e tts
+
             UpdateGenderControls();
-            UpdateTTSVoicesControls(); // CorvaxGoob-TTS
             Markings.SetSex(newSex);
             ReloadPreview();
         }
@@ -1542,14 +1485,6 @@ namespace Content.Client.Lobby.UI
             Profile = Profile?.WithGender(newGender);
             ReloadPreview();
         }
-
-        // CorvaxGoob-TTS-Start
-        private void SetVoice(string newVoice)
-        {
-            Profile = Profile?.WithVoice(newVoice);
-            IsDirty = true;
-        }
-        // CorvaxGoob-TTS-End
 
         private void SetSpecies(string newSpecies)
         {
